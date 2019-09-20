@@ -17,7 +17,8 @@
 #==============================================================================
 
 
-SEP_1 <- "#------------------------------------------------------------------------------"
+# SEP_1 <- "#------------------------------------------------------------------------------"
+SEP_1 <- "#----------------------------------------------------------"
 
 
 #==============================================================================
@@ -304,10 +305,10 @@ do_check <- function(survey_filepath="", survey_filename="") {
 			log_message <- c(log_message, qualitative_check(DATA, "abo", c("A", "B", "AB", "O")))
 #------------------------------------------------------------------------------
 			log_message <- c(log_message, quantitative_check(DATA, "mois", 1, 12))
-			log_message <- c(log_message, quantitative_check(DATA, "annee", 1910, 1998))
+			log_message <- c(log_message, quantitative_check(DATA, "annee", 1910, 1999))
 			log_message <- c(log_message, quantitative_check(DATA, "poids", 39, 180))
 			log_message <- c(log_message, quantitative_check(DATA, "taille", 130, 210))
-			log_message <- c(log_message, quantitative_check(DATA, "pointure", 35, 49))
+			log_message <- c(log_message, quantitative_check(DATA, "pointure", 30, 50))
 			log_message <- c(log_message, quantitative_check(DATA, "fratrie", 0, 40))
 		} else {
 			log_message <- c(log_message, "", SEP_1, "# CHECK Data Importation", SEP_1)
