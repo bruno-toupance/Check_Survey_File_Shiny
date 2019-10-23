@@ -158,16 +158,18 @@ quantitative_check <- function(DATA, var_name, min_value, max_value) {
 			if ( (max_x > max_value) || (min_x < min_value) ) {
 				log_message <- c(log_message, sprintf("  Expected Range: [%s, %s]", as.character(min_value), as.character(max_value)))
 				log_message <- c(log_message, sprintf("  Observed Range: [%s, %s]", as.character(min_x), as.character(max_x)))
-				log_message <- c(log_message, "  FAIL: Unexpected Values...")
+				log_message <- c(log_message, "  WARNING: Unexpected Values...")
 				high_values <- ""
 				low_values <- ""
 				for (k in 1:length(X)) {
-					if ( X[k] > max_value ) {
-						high_values <- sprintf("%s [%s]", high_values, X[k])
-					}
-					if ( X[k] < min_value ) {
-						low_values <- sprintf("%s [%s]", low_values, X[k])
-					}
+				  if (! is.na(X[k])) {
+				    if (X[k] > max_value) {
+				      high_values <- sprintf("%s [%s]", high_values, X[k])
+				    }
+				    if (X[k] < min_value) {
+				      low_values <- sprintf("%s [%s]", low_values, X[k])
+				    }
+				  }
 				}
 				if (max_x > max_value) {
 					log_message <- c(log_message, sprintf("        -> Check high values: %s", high_values))
@@ -336,6 +338,7 @@ do_check <- function(survey_filepath="", survey_filename="") {
 
 
 #==============================================================================
-# DATA <- read.table(file.choose(), header=TRUE)
-# do_check(file.choose())
+# FilePath <- file.choose()
+# DATA <- read.table(FilePath, header=TRUE)
+# do_check(FilePath)
 #==============================================================================
