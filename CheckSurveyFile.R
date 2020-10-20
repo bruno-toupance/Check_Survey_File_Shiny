@@ -25,7 +25,8 @@ SEP_1 <- "#----------------------------------------------------------"
 # qualitative_check
 #==============================================================================
 qualitative_check <- function(survey_df, var_name, expected_levels) {
-	log_message <- c("", SEP_1, sprintf("# CHECK Column [%s]", var_name), SEP_1)
+	log_message <- c("", SEP_1, 
+		sprintf("# CHECK Column [%s]", var_name), SEP_1)
 	expected_levels <- sort(expected_levels)
 	names(survey_df) <- tolower(names(survey_df))
 	if (var_name %in% names(survey_df)) { 
@@ -41,11 +42,17 @@ qualitative_check <- function(survey_df, var_name, expected_levels) {
 				log_message <- NULL
 			} else {
 				log_message <- c(log_message, "  FAIL: Unexpected Levels...")
-				log_message <- c(log_message, sprintf("        -> Expected: [%s]", paste(expected_levels, collapse="] [")))
-				log_message <- c(log_message, sprintf("        -> Observed: [%s]", paste(observed_levels, collapse="] [")))
+				log_message <- c(log_message, 
+					sprintf("        -> Expected: [%s]", 
+						paste(expected_levels, collapse="] [")))
+				log_message <- c(log_message, 
+					sprintf("        -> Observed: [%s]", 
+						paste(observed_levels, collapse="] [")))
 			}
 		} else {
-			log_message <- c(log_message, "  FAIL: Column should be coded as [factor]...")
+			log_message <- c(log_message, 
+				sprintf("  FAIL: Column should be coded as [factor] not as [%s]...", 
+					class(X)))
 		}
 	} else {
 		# log_message <- c(log_message, "  FAIL: Column not found...")
@@ -67,17 +74,27 @@ id_column_check <- function(survey_df) {
 	if (var_name %in% names(survey_df)) { 
 		X <- survey_df[, var_name]
 		if (class(X) == "factor") {
-			log_message <- c(log_message, sprintf("  FAIL: Unexpected values in column [id]..."))
-			log_message <- c(log_message, sprintf("        -> Expected: [%s]", paste(1:40, collapse="] [")))
-			log_message <- c(log_message, sprintf("        -> Observed: [%s]", paste(X,    collapse="] [")))
+			log_message <- c(log_message, 
+				sprintf("  FAIL: Unexpected values in column [id]..."))
+			log_message <- c(log_message, 
+				sprintf("        -> Expected: [%s]", 
+					paste(1:40, collapse="] [")))
+			log_message <- c(log_message, 
+				sprintf("        -> Observed: [%s]", 
+					paste(X,    collapse="] [")))
 		} else {
 			if (all(1:40 == X)) {
 				# log_message <- c(log_message, "  PASS")
 				log_message <- NULL
 			} else {
-				log_message <- c(log_message, sprintf("  FAIL: Unexpected values in column [id]..."))
-				log_message <- c(log_message, sprintf("        -> Expected:[%s]", paste(1:40, collapse="] [")))
-				log_message <- c(log_message, sprintf("        -> Observed:[%s]", paste(X, collapse="] [")))
+				log_message <- c(log_message, 
+					sprintf("  FAIL: Unexpected values in column [id]..."))
+				log_message <- c(log_message, 
+					sprintf("        -> Expected:[%s]", 
+						paste(1:40, collapse="] [")))
+				log_message <- c(log_message, 
+					sprintf("        -> Observed:[%s]", 
+						paste(X, collapse="] [")))
 			}
 		}
 	} else {
@@ -107,21 +124,31 @@ binome_column_check <- function(survey_df) {
 			binome_check <- grep("^BIN_[0-2][0-9]$", XX, perl=TRUE)
 			if (length(binome_check) == 1) {
 				if (XX == "BIN_00") {
-					log_message <- c(log_message, sprintf("  FAIL: Unexpected values in column [binome]..."))
-					log_message <- c(log_message, sprintf("        -> Use your binome id, not 00"))
+					log_message <- c(log_message, 
+						sprintf("  FAIL: Unexpected values in column [binome]..."))
+					log_message <- c(log_message, 
+						sprintf("        -> Use your binome id, not 00"))
 				} else {
 					# log_message <- c(log_message, "  PASS")
 					log_message <- NULL
 				}
 			} else {
-				log_message <- c(log_message, sprintf("  FAIL: Unexpected values in column [binome]..."))
-				log_message <- c(log_message, sprintf("        -> Expected pattern: [%s]", "BIN_##"))
-				log_message <- c(log_message, sprintf("        -> Observed values:  [%s]", paste(X, collapse="] [")))
+				log_message <- c(log_message, 
+					sprintf("  FAIL: Unexpected values in column [binome]..."))
+				log_message <- c(log_message, 
+					sprintf("        -> Expected pattern: [%s]", "BIN_##"))
+				log_message <- c(log_message, 
+					sprintf("        -> Observed values:  [%s]", 
+						paste(X, collapse="] [")))
 			}
 		} else {
-			log_message <- c(log_message, sprintf("  FAIL: Unexpected values in column [binome]..."))
-			log_message <- c(log_message, sprintf("        -> Expected pattern: [%s]", "BIN_##"))
-			log_message <- c(log_message, sprintf("        -> Observed values:  [%s]", paste(X, collapse="] [")))
+			log_message <- c(log_message, 
+				sprintf("  FAIL: Unexpected values in column [binome]..."))
+			log_message <- c(log_message, 
+				sprintf("        -> Expected pattern: [%s]", "BIN_##"))
+			log_message <- c(log_message, 
+				sprintf("        -> Observed values:  [%s]", 
+					paste(X, collapse="] [")))
 		}
 	} else {
 		# log_message <- c(log_message, "  FAIL: Column not found...")
@@ -150,14 +177,20 @@ quantitative_check <- function(survey_df, var_name, min_value, max_value) {
 					non_numeric <- sprintf("%s [%s]", non_numeric, XX[k])
 				}
 			}
-			log_message <- c(log_message, "        -> Remember to use '.' as decimal separator")
-			log_message <- c(log_message, sprintf("        -> Check values: %s", non_numeric))
+			log_message <- c(log_message, 
+				"        -> Remember to use '.' as decimal separator")
+			log_message <- c(log_message, 
+				sprintf("        -> Check values: %s", non_numeric))
 		} else {
 			min_x <- min(X, na.rm=TRUE)
 			max_x <- max(X, na.rm=TRUE)
 			if ( (max_x > max_value) || (min_x < min_value) ) {
-				log_message <- c(log_message, sprintf("  Expected Range: [%s, %s]", as.character(min_value), as.character(max_value)))
-				log_message <- c(log_message, sprintf("  Observed Range: [%s, %s]", as.character(min_x), as.character(max_x)))
+				log_message <- c(log_message, 
+					sprintf("  Expected Range: [%s, %s]", 
+						as.character(min_value), as.character(max_value)))
+				log_message <- c(log_message, 
+					sprintf("  Observed Range: [%s, %s]", 
+						as.character(min_x), as.character(max_x)))
 				log_message <- c(log_message, "  WARNING: Unexpected Values...")
 				high_values <- ""
 				low_values <- ""
@@ -172,10 +205,12 @@ quantitative_check <- function(survey_df, var_name, min_value, max_value) {
 				  }
 				}
 				if (max_x > max_value) {
-					log_message <- c(log_message, sprintf("        -> Check high values: %s", high_values))
+					log_message <- c(log_message, 
+						sprintf("        -> Check high values: %s", high_values))
 				}
 				if (min_x < min_value) {
-					log_message <- c(log_message, sprintf("        -> Check low values: %s", low_values))
+					log_message <- c(log_message, 
+						sprintf("        -> Check low values: %s", low_values))
 				}
 			} else {
 				# log_message <- c(log_message, "  PASS")
@@ -198,12 +233,16 @@ quantitative_check <- function(survey_df, var_name, min_value, max_value) {
 dimension_check <- function(survey_df) {
 	log_message <- NULL
 	if (ncol(survey_df) != 13) {
-		log_message <- c(log_message, sprintf("  FAIL: Unexpected number of columns..."))
-		log_message <- c(log_message, sprintf("        -> Expected [%d] - Observed [%d]", 13, ncol(survey_df)))
+		log_message <- c(log_message, 
+			sprintf("  FAIL: Unexpected number of columns..."))
+		log_message <- c(log_message, 
+			sprintf("        -> Expected [%d] - Observed [%d]", 13, ncol(survey_df)))
 	}
 	if (nrow(survey_df) != 40) {
-		log_message <- c(log_message, sprintf("  FAIL: Unexpected number of lines..."))
-		log_message <- c(log_message, sprintf("        -> Expected [%d] - Observed [%d]", 40, nrow(survey_df)))
+		log_message <- c(log_message, 
+			sprintf("  FAIL: Unexpected number of lines..."))
+		log_message <- c(log_message, 
+			sprintf("        -> Expected [%d] - Observed [%d]", 40, nrow(survey_df)))
 	}
 	if (length(log_message) > 0) {
 		log_message <- c("", SEP_1, "# CHECK Dimension", SEP_1, log_message)
@@ -219,33 +258,46 @@ dimension_check <- function(survey_df) {
 #==============================================================================
 column_names_check <- function(survey_df) {
 	log_message <- c("", SEP_1, "# CHECK Column Names", SEP_1)
-	expected_var_names <- c("binome", "id", "annee", "mois", "sexe", "poids", "taille", "yeux", "cheveux", "pointure", "fratrie", "cafe", "trajet")
+	expected_var_names <- c("binome", "id", "annee", "mois", "sexe", "poids", 
+		"taille", "yeux", "cheveux", "pointure", "fratrie", "cafe", "trajet")
 	observed_var_names <- names(survey_df)
 
 
 	column_message <- NULL
 	for (i in expected_var_names) {
 		if (! i %in% observed_var_names) {
-			column_message <- c(column_message, sprintf("  FAIL: Column [%s] not found...", i))
+			column_message <- c(column_message, 
+				sprintf("  FAIL: Column [%s] not found...", i))
 			if (i %in% tolower(observed_var_names)) {
 				pos <- which(tolower(observed_var_names) == i)
-				column_message <- c(column_message, sprintf("        -> Replace [%s] by [%s]", observed_var_names[pos], i))
+				column_message <- c(column_message, 
+					sprintf("        -> Replace [%s] by [%s]", 
+						observed_var_names[pos], i))
 			}
 		}
 	}
 	
 	if (length(column_message) > 0) {
 		log_message <- c(log_message, column_message)
-		log_message <- c(log_message, sprintf("        -> Expected: [%s]", paste(expected_var_names, collapse="] [")))
-		log_message <- c(log_message, sprintf("        -> Observed: [%s]", paste(observed_var_names, collapse="] [")))
+		log_message <- c(log_message, 
+			sprintf("        -> Expected: [%s]", 
+				paste(expected_var_names, collapse="] [")))
+		log_message <- c(log_message, 
+			sprintf("        -> Observed: [%s]", 
+				paste(observed_var_names, collapse="] [")))
 	} else {
 		if (all(expected_var_names == observed_var_names)) {
 			# log_message <- c(log_message, "  PASS")
 			log_message <- NULL
 		} else {
-			log_message <- c(log_message, sprintf("  FAIL: Unexpected column order..."))
-			log_message <- c(log_message, sprintf("        -> Expected: [%s]", paste(expected_var_names, collapse="] [")))
-			log_message <- c(log_message, sprintf("        -> Observed: [%s]", paste(observed_var_names, collapse="] [")))
+			log_message <- c(log_message, 
+				sprintf("  FAIL: Unexpected column order..."))
+			log_message <- c(log_message, 
+				sprintf("        -> Expected: [%s]", 
+					paste(expected_var_names, collapse="] [")))
+			log_message <- c(log_message, 
+				sprintf("        -> Observed: [%s]", 
+					paste(observed_var_names, collapse="] [")))
 		}
 	}
 	
@@ -263,7 +315,8 @@ duplicated_individuals_check <- function(survey_df) {
 	ID <- apply(survey_df, 1, function(x) {paste0(x[-2], collapse="")})
 	DUP <- which(duplicated(ID))
 	if (length(DUP) > 0 ) {
-		log_message <- c(log_message, sprintf("  FAIL: [%s]", paste(DUP, collapse="] [")))
+		log_message <- c(log_message, 
+			sprintf("  FAIL: [%s]", paste(DUP, collapse="] [")))
 	} else {
 		# log_message <- c(log_message, "  PASS")
 		log_message <- NULL
@@ -284,12 +337,16 @@ do_check <- function(survey_filepath="", survey_filename="") {
 		filename_check <- grep("^DATA_BIN_[0-2][0-9].txt$", survey_filename, perl=TRUE)
 		if (length(filename_check) == 0) {
 			log_message <- c(log_message, "", SEP_1, "# CHECK File Name", SEP_1)
-			log_message <- c(log_message, sprintf("  FAIL: Unexpected file name..."))
-			log_message <- c(log_message, sprintf("        -> Expected pattern: [DATA_BIN_##.txt]"))
-			log_message <- c(log_message, sprintf("        -> Observed value:   [%s]", survey_filename))
+			log_message <- c(log_message, 
+				sprintf("  FAIL: Unexpected file name..."))
+			log_message <- c(log_message, 
+				sprintf("        -> Expected pattern: [DATA_BIN_##.txt]"))
+			log_message <- c(log_message, 
+				sprintf("        -> Observed value:   [%s]", survey_filename))
 		}
 #------------------------------------------------------------------------------
-		survey_df <- read.table(survey_filepath, header=TRUE, sep="\t", dec=".")
+		survey_df <- read.table(survey_filepath, header=TRUE, sep="\t", 
+			dec=".", stringsAsFactors=TRUE)
 		if (class(survey_df) == "data.frame") {
 #------------------------------------------------------------------------------
 			log_message <- c(log_message, dimension_check(survey_df))
@@ -301,20 +358,32 @@ do_check <- function(survey_filepath="", survey_filename="") {
 			log_message <- c(log_message, id_column_check(survey_df))
 			log_message <- c(log_message, binome_column_check(survey_df))
 #------------------------------------------------------------------------------
-			log_message <- c(log_message, qualitative_check(survey_df, "sexe", c("H", "F")))
-			log_message <- c(log_message, qualitative_check(survey_df, "yeux", c("B", "V", "M")))
-			log_message <- c(log_message, qualitative_check(survey_df, "cheveux", c("BR", "BL", "CH", "RX")))
-			log_message <- c(log_message, quantitative_check(survey_df, "mois", 1, 12))
-			log_message <- c(log_message, quantitative_check(survey_df, "annee", 1910, 2002))
-			log_message <- c(log_message, quantitative_check(survey_df, "poids", 39, 180))
-			log_message <- c(log_message, quantitative_check(survey_df, "taille", 130, 210))
-			log_message <- c(log_message, quantitative_check(survey_df, "pointure", 30, 50))
-			log_message <- c(log_message, quantitative_check(survey_df, "fratrie", 0, 40))
-			log_message <- c(log_message, quantitative_check(survey_df, "cafe", 0, 40))
-			log_message <- c(log_message, quantitative_check(survey_df, "trajet", 0, 180))
+			log_message <- c(log_message, 
+				qualitative_check(survey_df, "sexe", c("H", "F")))
+			log_message <- c(log_message, 
+				qualitative_check(survey_df, "yeux", c("B", "V", "M")))
+			log_message <- c(log_message, 
+				qualitative_check(survey_df, "cheveux", c("BR", "BL", "CH", "RX")))
+			log_message <- c(log_message, 
+				quantitative_check(survey_df, "mois", 1, 12))
+			log_message <- c(log_message, 
+				quantitative_check(survey_df, "annee", 1910, 2002))
+			log_message <- c(log_message, 
+				quantitative_check(survey_df, "poids", 39, 180))
+			log_message <- c(log_message, 
+				quantitative_check(survey_df, "taille", 130, 210))
+			log_message <- c(log_message, 
+				quantitative_check(survey_df, "pointure", 30, 50))
+			log_message <- c(log_message, 
+				quantitative_check(survey_df, "fratrie", 0, 40))
+			log_message <- c(log_message, 
+				quantitative_check(survey_df, "cafe", 0, 40))
+			log_message <- c(log_message, 
+				quantitative_check(survey_df, "trajet", 0, 180))
 		} else {
 			log_message <- c(log_message, "", SEP_1, "# CHECK Data Importation", SEP_1)
-			log_message <- c(log_message, sprintf("  FAIL: Unable to open file as a [data.frame]..."))
+			log_message <- c(log_message, 
+				sprintf("  FAIL: Unable to open file as a [data.frame]..."))
 		}
 	} else {
 		log_message <- c(log_message, "", SEP_1, "# CHECK File", SEP_1)
