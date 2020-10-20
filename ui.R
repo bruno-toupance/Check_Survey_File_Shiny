@@ -24,7 +24,7 @@ require(shiny)
 #==============================================================================
 shinyUI(
 	pageWithSidebar(
-		headerPanel("L3-MEG Survey File Checker - v2020.1a"),
+		headerPanel("L3-MEG Survey File Checker - v2020.1b"),
 		sidebarPanel(
 			fileInput('survey_infile', 'Choose Survey File',
 			accept=c('text/plain', '.txt'))
