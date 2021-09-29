@@ -1,6 +1,6 @@
 #==============================================================================
 #    ui.R : Survey File Check - Shiny User Interface
-#    Copyright (C) 2020  Bruno Toupance <bruno.toupance@mnhn.fr>
+#    Copyright (C) 2021  Bruno Toupance <bruno.toupance@mnhn.fr>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@ require(shiny)
 #==============================================================================
 shinyUI(
 	pageWithSidebar(
-		headerPanel("L3-MEG Survey File Checker - v2020.1b"),
+		headerPanel("L3-MEG Survey File Checker - v2021.1b"),
 		sidebarPanel(
 			fileInput('survey_infile', 'Choose Survey File',
-			accept=c('text/plain', '.txt'))
+			accept = c('text/plain', '.txt'))
 		),
 		mainPanel(
 			verbatimTextOutput('contents')
