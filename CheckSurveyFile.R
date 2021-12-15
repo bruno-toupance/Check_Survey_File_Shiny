@@ -17,9 +17,24 @@
 #==============================================================================
 
 
+
+#==============================================================================
+# Values to be modified every year
+#==============================================================================
+year <- 2021
+
+extra_var <- c("transport", "etude")
+extra_min <- c(0, 0)
+extra_max <- c(6*60, 30)
+
+
+#==============================================================================
+# Separator constants
+#==============================================================================
 SEP_60 <- "#----------------------------------------------------------"
 TAB_1 <- "  "
-TAB_2 <- "        "
+TAB_2 <- "    "
+TAB_3 <- "      "
 
 
 #==============================================================================
@@ -30,18 +45,19 @@ qualitative_check <- function(survey_df, var_name, expected_levels) {
 	txt <- sprintf("# CHECK Column [%s]", var_name)
 	log_msg <- c("", SEP_60, txt, SEP_60)
 
-	expected_levels <- sort(expected_levels)
+	expected_levels <- unique(sort(expected_levels))
 	names(survey_df) <- tolower(names(survey_df))
 
 	if (var_name %in% names(survey_df)) {
 		X <- survey_df[, var_name]
 
 		if (class(X) == "character") {
-			observed_levels <- sort(levels(X))
+			# observed_levels <- sort(levels(X))
+			observed_levels <- unique(sort(X))
 
 			result <- TRUE
 			for (i in observed_levels) {
-				result <- result & (i %in% expected_levels)
+				result <- result & (i %in% expected_levels)	
 			}
 
 			if (result) {
@@ -56,13 +72,21 @@ qualitative_check <- function(survey_df, var_name, expected_levels) {
 				log_msg <- c(log_msg, txt)
 
 				txt <- paste(expected_levels, collapse = "] [")
-				txt <- sprintf("%s-> Expected: [%s]", TAB_2, txt)
+				txt <- sprintf("%sExpected: [%s]", TAB_2, txt)
 				log_msg <- c(log_msg, txt)
 
 				txt <- paste(observed_levels, collapse = "] [")
-				txt <- sprintf("%s-> Observed: [%s]", TAB_2, txt)
+				txt <- sprintf("%sObserved: [%s]", TAB_2, txt)
 				log_msg <- c(log_msg, txt)
 
+				unexpected_levels <- setdiff(observed_levels, expected_levels)
+				
+				for (level in unexpected_levels) {
+					ind_vec <- which(X == level)
+					txt <- paste(ind_vec, collapse = "] [")
+					txt <- sprintf("%sCheck individual [%s]: [%s]", TAB_3, txt, level)
+					log_msg <- c(log_msg, txt)
+				}
 			}
 
 		} else {
@@ -107,16 +131,16 @@ id_column_check <- function(survey_df) {
 			log_msg <- c(log_msg, txt)
 
 			txt <- paste(1:40, collapse = "] [")
-			txt <- sprintf("%s-> Expected: [%s]", TAB_2, txt)
+			txt <- sprintf("%sExpected: [%s]", TAB_2, txt)
 			log_msg <- c(log_msg, txt)
 
 			txt <- paste(X, collapse = "] [")
-			txt <- sprintf("%s-> Observed: [%s]", TAB_2, txt)
+			txt <- sprintf("%sObserved: [%s]", TAB_2, txt)
 			log_msg <- c(log_msg, txt)
 
 		} else {
 
-			if (all(1:40 == X)) {
+			if (identical(1:40, X)) {
 
 				# txt <- sprintf("%sPASS", TAB_1)
 				# log_msg <- c(log_msg, txt)
@@ -128,11 +152,11 @@ id_column_check <- function(survey_df) {
 				log_msg <- c(log_msg, txt)
 
 				txt <- paste(1:40, collapse = "] [")
-				txt <- sprintf("%s-> Expected:[%s]", TAB_2, txt)
+				txt <- sprintf("%sExpected:[%s]", TAB_2, txt)
 				log_msg <- c(log_msg, txt)
 
 				txt <- paste(X, collapse = "] [")
-				txt <- sprintf("%s-> Observed:[%s]", TAB_2, txt)
+				txt <- sprintf("%sObserved:[%s]", TAB_2, txt)
 				log_msg <- c(log_msg, txt)
 
 			}
@@ -182,7 +206,7 @@ binome_column_check <- function(survey_df) {
 					txt <- sprintf("%sFAIL: Unexpected values in column [binome]...", TAB_1)
 					log_msg <- c(log_msg, txt)
 
-					txt <- sprintf("%s-> Use your binome id, not 00", TAB_2)
+					txt <- sprintf("%sUse your binome id, not 00", TAB_2)
 					log_msg <- c(log_msg, txt)
 
 				} else {
@@ -198,11 +222,11 @@ binome_column_check <- function(survey_df) {
 				txt <- sprintf("%sFAIL: Unexpected values in column [binome]...", TAB_1)
 				log_msg <- c(log_msg, txt)
 
-				txt <- sprintf("%s-> Expected pattern: [%s]", "BIN_##", TAB_2)
+				txt <- sprintf("%sExpected pattern: [%s]", "BIN_##", TAB_2)
 				log_msg <- c(log_msg, txt)
 
 				txt <- paste(X, collapse = "] [")
-				txt <- sprintf("%s-> Observed values:  [%s]", TAB_2, txt)
+				txt <- sprintf("%sObserved values:  [%s]", TAB_2, txt)
 				log_msg <- c(log_msg, txt)
 
 			}
@@ -212,11 +236,11 @@ binome_column_check <- function(survey_df) {
 			txt <- sprintf("%sFAIL: Unexpected values in column [binome]...", TAB_1)
 			log_msg <- c(log_msg, txt)
 
-			txt <- sprintf("%s-> Expected pattern: [%s]", TAB_2, "BIN_##")
+			txt <- sprintf("%sExpected pattern: [%s]", TAB_2, "BIN_##")
 			log_msg <- c(log_msg, txt)
 
 			txt <- paste(X, collapse = "] [")
-			txt <- sprintf("%s-> Observed values:  [%s]", TAB_2, txt)
+			txt <- sprintf("%sObserved values:  [%s]", TAB_2, txt)
 			log_msg <- c(log_msg, txt)
 
 		}
@@ -260,10 +284,10 @@ quantitative_check <- function(survey_df, var_name, min_val, max_val) {
 				}
 			}
 
-			txt <- sprintf("%s-> Remember to use '.' as decimal separator", TAB_2)
+			txt <- sprintf("%sRemember to use '.' as decimal separator", TAB_2)
 			log_msg <- c(log_msg, txt)
 
-			txt <- sprintf("%s-> Check values: %s", TAB_2, non_numeric)
+			txt <- sprintf("%sCheck values: %s", TAB_2, non_numeric)
 			log_msg <- c(log_msg, txt)
 
 		} else {
@@ -281,34 +305,20 @@ quantitative_check <- function(survey_df, var_name, min_val, max_val) {
 				txt <- sprintf("%sObserved Range: %s", TAB_1, txt)
 				log_msg <- c(log_msg, txt)
 
-				txt <- sprintf("%sWARNING: Unexpected Values...", TAB_1)
+				txt <- sprintf("%sWARNING: Out of bounds values...", TAB_1)
 				log_msg <- c(log_msg, txt)
 
-				high_val <- ""
-				low_val <- ""
 				for (k in 1:length(X)) {
 					if (! is.na(X[k])) {
 						if (X[k] > max_val) {
-							high_val <- sprintf("%s [%s]", high_val, X[k])
+							txt <- sprintf("%sCheck individual [%s]: Unexpected high value [%s]", TAB_2, k, X[k])
+							log_msg <- c(log_msg, txt)
 						}
 						if (X[k] < min_val) {
-							low_val <- sprintf("%s [%s]", low_val, X[k])
+							txt <- sprintf("%sCheck individual [%s]: Unexpected low value [%s]", TAB_2, k, X[k])
+							log_msg <- c(log_msg, txt)
 						}
 					}
-				}
-
-				if (max_x > max_val) {
-
-					txt <- sprintf("%s-> Check high values: %s", TAB_2, high_val)
-					log_msg <- c(log_msg, txt)
-
-				}
-
-				if (min_x < min_val) {
-
-					txt <- sprintf("%s-> Check low values: %s", TAB_2, low_val)
-					log_msg <- c(log_msg, txt)
-
 				}
 
 			} else {
@@ -318,6 +328,19 @@ quantitative_check <- function(survey_df, var_name, min_val, max_val) {
 				log_msg <- NULL
 
 			}
+			
+			
+			dec_pos <- which(X != round(X))
+			if (length(dec_pos) > 0) {
+				txt <- sprintf("%sWARNING: Not integer values...", TAB_1)
+				log_msg <- c(log_msg, txt)
+
+				for (k in dec_pos) {
+					txt <- sprintf("%sCheck individual [%s]: Unexpected decimal value [%s]", TAB_2, k, X[k])
+					log_msg <- c(log_msg, txt)
+				}
+			}
+			
 		}
 
 	} else {
@@ -347,10 +370,10 @@ dimension_check <- function(survey_df) {
 		txt <- sprintf("%sFAIL: Unexpected number of columns...", TAB_1)
 		log_msg <- c(log_msg, txt)
 
-		txt <- sprintf("%s-> Expected [%d]", TAB_2, exp_nb_col)
+		txt <- sprintf("%sExpected [%d]", TAB_2, exp_nb_col)
 		log_msg <- c(log_msg, txt)
 
-		txt <- sprintf("%s-> Observed [%d]", TAB_2, obs_nb_col)
+		txt <- sprintf("%sObserved [%d]", TAB_2, obs_nb_col)
 		log_msg <- c(log_msg, txt)
 
 	}
@@ -363,10 +386,10 @@ dimension_check <- function(survey_df) {
 		txt<- sprintf("%sFAIL: Unexpected number of lines...", TAB_1)
 		log_msg <- c(log_msg, txt)
 
-		txt <- sprintf("%s-> Expected [%d]", TAB_2, exp_nb_row)
+		txt <- sprintf("%sExpected [%d]", TAB_2, exp_nb_row)
 		log_msg <- c(log_msg, txt)
 
-		txt <- sprintf("%s-> Observed [%d]", TAB_2, obs_nb_row)
+		txt <- sprintf("%sObserved [%d]", TAB_2, obs_nb_row)
 		log_msg <- c(log_msg, txt)
 
 	}
@@ -393,8 +416,9 @@ column_names_check <- function(survey_df) {
 	log_msg <- c("", SEP_60, txt, SEP_60)
 
 	exp_var_names <- c("binome", "id", "annee", "mois", "sexe", "poids", 
-	                   "taille", "yeux", "cheveux", "pointure", "fratrie", 
-	                   "transport", "etude")
+	                   "taille", "yeux", "cheveux", "pointure", "fratrie")
+	exp_var_names <- c(exp_var_names, extra_var)
+	
 	obs_var_names <- names(survey_df)
 
 
@@ -411,7 +435,7 @@ column_names_check <- function(survey_df) {
 
 				pos <- which(tolower(obs_var_names) == i)
 
-				txt <- sprintf("%s-> Replace [%s] by [%s]", TAB_2, obs_var_names[pos], i)
+				txt <- sprintf("%sReplace [%s] by [%s]", TAB_2, obs_var_names[pos], i)
 				col_msg <- c(col_msg, txt)
 
 			}
@@ -423,11 +447,11 @@ column_names_check <- function(survey_df) {
 		log_msg <- c(log_msg, col_msg)
 
 		txt <- paste(exp_var_names, collapse = "] [")
-		txt <- sprintf("%s-> Expected: [%s]", TAB_2, txt)
+		txt <- sprintf("%sExpected: [%s]", TAB_2, txt)
 		log_msg <- c(log_msg, txt)
 
 		txt <- paste(obs_var_names, collapse = "] [")
-		txt <- sprintf("%s-> Observed: [%s]", TAB_2, txt)
+		txt <- sprintf("%sObserved: [%s]", TAB_2, txt)
 		log_msg <- c(log_msg, txt)
 
 	} else {
@@ -444,11 +468,11 @@ column_names_check <- function(survey_df) {
 			log_msg <- c(log_msg, txt)
 
 			txt <- paste(exp_var_names, collapse = "] [")
-			txt <- sprintf("%s-> Expected: [%s]", TAB_2, txt)
+			txt <- sprintf("%sExpected: [%s]", TAB_2, txt)
 			log_msg <- c(log_msg, txt)
 
 			txt <- paste(obs_var_names, collapse = "] [")
-			txt <- sprintf("%s-> Observed: [%s]", TAB_2, txt)
+			txt <- sprintf("%sObserved: [%s]", TAB_2, txt)
 			log_msg <- c(log_msg, txt)
 
 		}
@@ -468,14 +492,17 @@ duplicated_individuals_check <- function(survey_df) {
 	txt <- "# CHECK Duplicated Individuals"
 	log_msg <- c("", SEP_60, txt, SEP_60)
 
-	ID <- apply(survey_df, 1, function(x) {paste0(x[-2], collapse = "")})
-	DUP <- which(duplicated(ID))
+	ind_id <- apply(survey_df, 1, function(x) {paste0(x[-2], collapse = "")})
+	dup_vec <- which(duplicated(ind_id))
 
-	if (length(DUP) > 0 ) {
-
-		txt <- paste(DUP, collapse = "] [")
-		txt <- sprintf("%sFAIL: [%s]", TAB_1, txt)
+	if (length(dup_vec) > 0 ) {
+		txt <- sprintf("%sWARNING:", TAB_1)
 		log_msg <- c(log_msg, txt)
+		for (dup_ind in dup_vec) {
+			ini_ind <- which(ind_id == ind_id[dup_ind])[1]
+			txt <- sprintf("%sCheck duplicated individual [%d] == individual [%d]", TAB_2, dup_ind, ini_ind)
+			log_msg <- c(log_msg, txt)
+		}
 
 	} else {
 
@@ -511,11 +538,11 @@ do_check <- function(survey_filepath = "", survey_filename = "") {
 			txt <- sprintf("%sFAIL: Unexpected file name...", TAB_1)
 			log_msg <- c(log_msg, txt)
 
-			txt <- sprintf("%s-> Expected pattern: [DATA_BIN_##.txt]", TAB_2)
+			txt <- sprintf("%sExpected pattern: [DATA_BIN_##.txt]", TAB_2)
 			log_msg <- c(log_msg, txt)
 
 			txt <- survey_filename
-			txt <- sprintf("%s-> Observed value:   [%s]", TAB_2, txt)
+			txt <- sprintf("%sObserved value:   [%s]", TAB_2, txt)
 			log_msg <- c(log_msg, txt)
 
 		}
@@ -558,7 +585,7 @@ do_check <- function(survey_filepath = "", survey_filename = "") {
 			txt <- quantitative_check(survey_df, "mois", 1, 12)
 			log_msg <- c(log_msg, txt)
 
-			txt <- quantitative_check(survey_df, "annee", 1910, 2003)
+			txt <- quantitative_check(survey_df, "annee", year - 122, year - 18)
 			log_msg <- c(log_msg, txt)
 
 			txt <- quantitative_check(survey_df, "poids", 39, 180)
@@ -573,10 +600,10 @@ do_check <- function(survey_filepath = "", survey_filename = "") {
 			txt <- quantitative_check(survey_df, "fratrie", 0, 40)
 			log_msg <- c(log_msg, txt)
 
-			txt <- quantitative_check(survey_df, "transport", 0, 6*60)
+			txt <- quantitative_check(survey_df, extra_var[1], extra_min[1], extra_max[1])
 			log_msg <- c(log_msg, txt)
 
-			txt <- quantitative_check(survey_df, "etude", 0, 30)
+			txt <- quantitative_check(survey_df, extra_var[2], extra_min[2], extra_max[2])
 			log_msg <- c(log_msg, txt)
 
 		} else {
@@ -618,10 +645,3 @@ do_check <- function(survey_filepath = "", survey_filename = "") {
 #==============================================================================
 
 
-
-
-#==============================================================================
-# filepath <- file.choose()
-# survey_df <- read.table(filepath, header=TRUE)
-# do_check(filepath)
-#==============================================================================

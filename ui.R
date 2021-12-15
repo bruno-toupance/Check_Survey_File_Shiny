@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #==============================================================================
 
-require(shiny)
+library("shiny")
 
 
 #==============================================================================
@@ -24,14 +24,20 @@ require(shiny)
 #==============================================================================
 shinyUI(
 	pageWithSidebar(
+	
 		headerPanel("L3-MEG Survey File Checker - v2021.1b"),
+
 		sidebarPanel(
-			fileInput('survey_infile', 'Choose Survey File',
-			accept = c('text/plain', '.txt'))
+			fileInput(
+				'survey_infile', 'Choose Survey File',
+				accept = c('text/plain', '.txt')
+			)
 		),
+
 		mainPanel(
 			verbatimTextOutput('contents')
 		)
+
 	)
 )
 #==============================================================================

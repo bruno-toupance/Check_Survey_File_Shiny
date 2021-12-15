@@ -13,6 +13,6 @@ install.packages("shiny")
 
 ## Run from R
 ```{r }
-require(shiny)
+require("shiny")
 runGitHub(repo = "Check_Survey_File_Shiny", username = "bruno-toupance", ref = "main")
 ```

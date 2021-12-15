@@ -1,6 +1,6 @@
 #==============================================================================
 #    ui.R : Survey File Check - Shiny Server
-#    Copyright (C) 2019  Bruno Toupance <bruno.toupance@mnhn.fr>
+#    Copyright (C) 2021  Bruno Toupance <bruno.toupance@mnhn.fr>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #==============================================================================
 
-require(shiny)
+library("shiny")
 
 source("CheckSurveyFile.R")
 
