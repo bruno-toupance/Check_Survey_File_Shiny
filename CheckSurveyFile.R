@@ -1,6 +1,6 @@
 #==============================================================================
 #    CheckSurveyFile.R : Check Survey File
-#    Copyright (C) 2021  Bruno Toupance <bruno.toupance@mnhn.fr>
+#    Copyright (C) 2022  Bruno Toupance <bruno.toupance@mnhn.fr>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,11 +21,16 @@
 #==============================================================================
 # Values to be modified every year
 #==============================================================================
-year <- 2021
+year <- 2022
 
-extra_var <- c("transport", "etude")
-extra_min <- c(0, 0)
-extra_max <- c(6*60, 30)
+extra_var <- c("pnais", "sleep")
+extra_min <- c(0.5, 0)
+extra_max <- c(7.0, 24)
+extra_mul <- c(10.0, 2.0)
+
+# Debug flag
+show_all <- FALSE
+
 
 
 #==============================================================================
@@ -210,11 +215,12 @@ binome_column_check <- function(survey_df) {
 					log_msg <- c(log_msg, txt)
 
 				} else {
-
-					# txt <- sprintf("%sPASS", TAB_1)
-					# log_msg <- c(log_msg, txt)
-					log_msg <- NULL
-
+					if (show_all) {
+						txt <- sprintf("%sPASS", TAB_1)
+						log_msg <- c(log_msg, txt)
+					} else {
+						log_msg <- NULL	
+					}
 				}
 
 			} else {
@@ -262,16 +268,20 @@ binome_column_check <- function(survey_df) {
 #==============================================================================
 # quantitative_check
 #==============================================================================
-quantitative_check <- function(survey_df, var_name, min_val, max_val) {
+quantitative_check <- function(survey_df, var_name, min_val, max_val, mul = 1.0) {
 
 	txt <- sprintf("# CHECK Column [%s]", var_name)
 	log_msg <- c("", SEP_60, txt, SEP_60)
+	
+	error_flag <- FALSE
 
 	names(survey_df) <- tolower(names(survey_df))
 	if (var_name %in% names(survey_df)) {
 		X <- survey_df[, var_name]
 
 		if (class(X) == "character") {
+			error_flag <- TRUE
+			
 			XX <- as.character(X)
 
 			txt <- sprintf("%sFAIL: Column should be numeric...", TAB_1)
@@ -296,6 +306,7 @@ quantitative_check <- function(survey_df, var_name, min_val, max_val) {
 			max_x <- max(X, na.rm = TRUE)
 
 			if ( (max_x > max_val) || (min_x < min_val) ) {
+				error_flag <- TRUE
 
 				txt <- sprintf("[%s, %s]", as.character(min_val), as.character(max_val))
 				txt <- sprintf("%sExpected Range: %s", TAB_1, txt)
@@ -305,7 +316,7 @@ quantitative_check <- function(survey_df, var_name, min_val, max_val) {
 				txt <- sprintf("%sObserved Range: %s", TAB_1, txt)
 				log_msg <- c(log_msg, txt)
 
-				txt <- sprintf("%sWARNING: Out of bounds values...", TAB_1)
+				txt <- sprintf("%sWARNING: Some values are out of bounds...", TAB_1)
 				log_msg <- c(log_msg, txt)
 
 				for (k in 1:length(X)) {
@@ -320,36 +331,42 @@ quantitative_check <- function(survey_df, var_name, min_val, max_val) {
 						}
 					}
 				}
-
-			} else {
-
-				# txt <- sprintf("%sPASS", TAB_1)
-				# log_msg <- c(log_msg, txt)
-				log_msg <- NULL
-
 			}
-			
-			
-			dec_pos <- which(X != round(X))
+
+			XX <- mul * X
+			dec_pos <- which(XX != round(XX))
 			if (length(dec_pos) > 0) {
-				txt <- sprintf("%sWARNING: Not integer values...", TAB_1)
+				error_flag <- TRUE
+				
+				txt <- sprintf("%sWARNING: Unexpected precision...", TAB_1)
 				log_msg <- c(log_msg, txt)
 
 				for (k in dec_pos) {
-					txt <- sprintf("%sCheck individual [%s]: Unexpected decimal value [%s]", TAB_2, k, X[k])
+					txt <- sprintf("%sCheck individual [%s]: Unexpected numerical value [%s]", TAB_2, k, X[k])
 					log_msg <- c(log_msg, txt)
+				}
+			}
+			
+			if (! error_flag) {
+				if (show_all) {
+					txt <- sprintf("%sPASS", TAB_1)
+					log_msg <- c(log_msg, txt)
+				} else {
+					log_msg <- NULL	
 				}
 			}
 			
 		}
 
 	} else {
-
-		# txt <- sprintf("%sFAIL: Column not found...", TAB_1)
-		# log_msg <- c(log_msg, txt)
-		log_msg <- NULL
-
+		if (show_all) {
+			txt <- sprintf("%sPASS", TAB_1)
+			log_msg <- c(log_msg, txt)
+		} else {
+			log_msg <- NULL	
+		}
 	}
+
 	return(log_msg)
 }
 #==============================================================================
@@ -362,7 +379,7 @@ quantitative_check <- function(survey_df, var_name, min_val, max_val) {
 dimension_check <- function(survey_df) {
 	log_msg <- NULL
 
-	exp_nb_col <- 13
+	exp_nb_col <- 11 + length(extra_var)
 	obs_nb_col <- ncol(survey_df)
 
 	if (obs_nb_col != exp_nb_col) {
@@ -600,10 +617,10 @@ do_check <- function(survey_filepath = "", survey_filename = "") {
 			txt <- quantitative_check(survey_df, "fratrie", 0, 40)
 			log_msg <- c(log_msg, txt)
 
-			txt <- quantitative_check(survey_df, extra_var[1], extra_min[1], extra_max[1])
+			txt <- quantitative_check(survey_df, extra_var[1], extra_min[1], extra_max[1], extra_mul[1])
 			log_msg <- c(log_msg, txt)
 
-			txt <- quantitative_check(survey_df, extra_var[2], extra_min[2], extra_max[2])
+			txt <- quantitative_check(survey_df, extra_var[2], extra_min[2], extra_max[2], extra_mul[2])
 			log_msg <- c(log_msg, txt)
 
 		} else {
