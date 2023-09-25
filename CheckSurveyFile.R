@@ -1,6 +1,6 @@
 #==============================================================================
 #    CheckSurveyFile.R : Check Survey File
-#    Copyright (C) 2022  Bruno Toupance <bruno.toupance@mnhn.fr>
+#    Copyright (C) 2023  Bruno Toupance <bruno.toupance@mnhn.fr>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,12 +21,22 @@
 #==============================================================================
 # Values to be modified every year
 #==============================================================================
-year <- 2022
 
-extra_var <- c("pnais", "sleep")
-extra_min <- c(0.5, 0)
-extra_max <- c(7.0, 24)
-extra_mul <- c(10.0, 2.0)
+# Current year
+year <- 2023
+
+# Extra variable names
+extra_var <- c("sleep", "pets")
+
+# Extra variable minimum values
+extra_min <- c(0, 0)
+
+# Extra variable maximum values
+extra_max <- c(24, 100)
+
+# Extra variable precision values: "value * mul" must be an integer
+extra_mul <- c(2.0, 1.0)
+
 
 # Debug flag
 show_all <- FALSE
@@ -228,7 +238,7 @@ binome_column_check <- function(survey_df) {
 				txt <- sprintf("%sFAIL: Unexpected values in column [binome]...", TAB_1)
 				log_msg <- c(log_msg, txt)
 
-				txt <- sprintf("%sExpected pattern: [%s]", "BIN_##", TAB_2)
+				txt <- sprintf("%sExpected pattern: [%s]", TAB_2, "BIN_##")
 				log_msg <- c(log_msg, txt)
 
 				txt <- paste(X, collapse = "] [")
