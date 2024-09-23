@@ -1,6 +1,6 @@
 #==============================================================================
 #    ui.R : Survey File Check - Shiny Server
-#    Copyright (C) 2023  Bruno Toupance <bruno.toupance@mnhn.fr>
+#    Copyright (C) 2024  Bruno Toupance <bruno.toupance@mnhn.fr>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,21 +24,20 @@ source("CheckSurveyFile.R")
 # shinyServer
 #==============================================================================
 shinyServer(
-	function(input, output) {
-		output$contents <- renderText(
-			{
-
-				survey_infile <- input$survey_infile
-
-				if (is.null(survey_infile)) {
-					return(NULL)
-				}
-
-				log_message <- do_check(survey_infile$datapath, survey_infile$name)
-				
-				return(log_message)
-			}
-		)
-	}
+    function(input, output) {
+        output$contents <- renderText(
+            {
+                
+                survey_infile <- input$survey_infile
+                
+                if (is.null(survey_infile)) {
+                    return(NULL)
+                }
+                
+                log_message <- do_check(survey_infile$datapath, survey_infile$name)
+                
+                return(log_message)
+            }
+        )
+    }
 )
-#==============================================================================
