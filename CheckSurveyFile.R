@@ -23,7 +23,7 @@
 #==============================================================================
 
 # Current year
-year <- 2024
+year <- 2026
 
 # Extra variable names
 extra_var <- c("sleep", "coffee")
